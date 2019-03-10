@@ -4,15 +4,22 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
+
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.Result;
 
 import androidx.annotation.NonNull;
 
 public class MainActivity extends AppCompatActivity {
     private CodeScanner mCodeScanner;
+    DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +34,36 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(MainActivity.this, result.getText(), Toast.LENGTH_SHORT).show();
+                        rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@android.support.annotation.NonNull DataSnapshot dataSnapshot) {
+                                if (!dataSnapshot.child(result.getText()).exists())
+                                    Toast.makeText(MainActivity.this, "User isn't accepted", Toast.LENGTH_LONG).show();
+                                else {
+                                rootRef.child(result.getText()).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@android.support.annotation.NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.child("attended").exists()) {
+                                            Toast.makeText(MainActivity.this, "User already attended", Toast.LENGTH_LONG).show();
+                                        } else {
+                                            rootRef.child(result.getText()).child("attended").setValue("true");
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@android.support.annotation.NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@android.support.annotation.NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        rootRef.child(result.getText()).child("attended").setValue("true");
                     }
                 });
             }
