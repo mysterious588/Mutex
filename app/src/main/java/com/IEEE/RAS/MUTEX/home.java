@@ -18,16 +18,27 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class home extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;
     private Button scanButton;
+
+    DatabaseReference rootRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+
+        FirebaseApp.initializeApp(this);
+        rootRef = FirebaseDatabase.getInstance().getReference();
         scanButton = findViewById(R.id.scanButton);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -51,6 +62,12 @@ public class home extends AppCompatActivity {
         } else {
             // Permission has already been granted
         }
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               startActivity(new Intent(home.this,MainActivity.class));
+            }
+        });
     }
 
     @Override
@@ -70,15 +87,9 @@ public class home extends AppCompatActivity {
             // other 'case' lines to check for other
             // permissions this app might request.
         }
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(home.this,MainActivity.class));
-            }
-        });
 
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="ds253468.mlab.com";
+        String url = "ds253468.mlab.com";
 
 // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -86,15 +97,38 @@ public class home extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        Toast.makeText(home.this,response.substring(0,500),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(home.this, response.substring(0, 500), Toast.LENGTH_SHORT).show();
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(home.this,"Failed Bitch",Toast.LENGTH_SHORT).show();
+                Toast.makeText(home.this, "Failed Bitch", Toast.LENGTH_SHORT).show();
             }
         });
 // Add the request to the RequestQueue.
         queue.add(stringRequest);
     }
+//
+//    public void test() {
+//        rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@android.support.annotation.NonNull DataSnapshot dataSnapshot) {
+//                if (!dataSnapshot.child("5c630c660e7d4a0015c897501").exists())
+//                    Toast.makeText(home.this, "User isn't accepted", Toast.LENGTH_LONG).show();
+//                else {
+//                    if (dataSnapshot.child("5c630c660e7d4a0015c897501").hasChild("attended")) {
+//                        Toast.makeText(home.this, "User already attended", Toast.LENGTH_LONG).show();
+//                    } else {
+//                        Toast.makeText(home.this, "Success", Toast.LENGTH_LONG).show();
+//                        rootRef.child("5c630c660e7d4a0015c897501").child("attended").setValue("true");
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@android.support.annotation.NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 }

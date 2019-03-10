@@ -40,30 +40,20 @@ public class MainActivity extends AppCompatActivity {
                                 if (!dataSnapshot.child(result.getText()).exists())
                                     Toast.makeText(MainActivity.this, "User isn't accepted", Toast.LENGTH_LONG).show();
                                 else {
-                                rootRef.child(result.getText()).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@android.support.annotation.NonNull DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.child("attended").exists()) {
-                                            Toast.makeText(MainActivity.this, "User already attended", Toast.LENGTH_LONG).show();
-                                        } else {
-                                            rootRef.child(result.getText()).child("attended").setValue("true");
-                                        }
+                                    if (dataSnapshot.child(result.getText()).hasChild("attended")) {
+                                        Toast.makeText(MainActivity.this, "User already attended", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
+                                        rootRef.child(result.getText()).child("attended").setValue("true");
                                     }
-
-                                    @Override
-                                    public void onCancelled(@android.support.annotation.NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
                                 }
                             }
+
                             @Override
                             public void onCancelled(@android.support.annotation.NonNull DatabaseError databaseError) {
 
                             }
                         });
-
-                        rootRef.child(result.getText()).child("attended").setValue("true");
                     }
                 });
             }
@@ -87,4 +77,6 @@ public class MainActivity extends AppCompatActivity {
         mCodeScanner.releaseResources();
         super.onPause();
     }
+
+
 }
