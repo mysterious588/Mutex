@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
                             }
-
                             @Override
                             public void onCancelled(@android.support.annotation.NonNull DatabaseError databaseError) {
 
