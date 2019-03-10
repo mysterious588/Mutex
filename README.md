@@ -1,2 +1,2 @@
 # Mutex
-This is a qr ticket code scanner for MUTEX event attendees.
+A QR ticket code scanner for MUTEX event attendees.
