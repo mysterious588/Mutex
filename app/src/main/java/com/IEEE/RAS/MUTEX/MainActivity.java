@@ -8,12 +8,15 @@ import android.widget.Toast;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.Result;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import androidx.annotation.NonNull;
 
@@ -38,13 +41,17 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@android.support.annotation.NonNull DataSnapshot dataSnapshot) {
                                 if (!dataSnapshot.child(result.getText()).exists())
-                                    Toast.makeText(MainActivity.this, "User isn't accepted", Toast.LENGTH_LONG).show();
+                                    FancyToast.makeText(MainActivity.this, "This user isn't rigistered", FancyToast.LENGTH_LONG, FancyToast.ERROR, false).show();
                                 else {
                                     if (dataSnapshot.child(result.getText()).hasChild("attended")) {
-                                        Toast.makeText(MainActivity.this, "User already attended", Toast.LENGTH_LONG).show();
+                                        FancyToast.makeText(MainActivity.this, "User has already attended", FancyToast.LENGTH_LONG, FancyToast.WARNING, false).show();
                                     } else {
-                                        Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
-                                        rootRef.child(result.getText()).child("attended").setValue("true");
+                                        rootRef.child(result.getText()).child("attended").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@android.support.annotation.NonNull Task<Void> task) {
+                                                FancyToast.makeText(MainActivity.this, "User has been registered successfully", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
+                                            }
+                                        });
                                     }
                                 }
                             }
